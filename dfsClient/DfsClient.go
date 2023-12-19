@@ -1,8 +1,8 @@
-package client
+package dfsClient
 
 import (
-	"dfs-sdk-go/request"
-	"dfs-sdk-go/utils"
+	"github.com/jiyudonggithub/dfs-sdk/request"
+	"github.com/jiyudonggithub/dfs-sdk/utils"
 	"path/filepath"
 )
 
@@ -11,31 +11,25 @@ type DfsClient struct {
 	bucketName string
 	AccessKey  string
 	SecretKey  string
+	Host       string
 }
 
 /*
 *
-
-	request.UploadFileRequest{
-			AccessKey:  client.AccessKey,
-			SecretKey:  client.SecretKey,
-			BucketName: client.bucketName,
-			FileName:   filepath.Base(fileName),
-		}
-
-		创建 client
+创建 dfsClient
 */
 func InitClient(accessKey string,
 	secretKey string,
-	bucketName string) *DfsClient {
+	bucketName string,
+	host string) *DfsClient {
 
 	client := NewHttpClient()
 
-	return &DfsClient{client, bucketName, accessKey, secretKey}
+	return &DfsClient{client, bucketName, accessKey, secretKey, host}
 }
 
 func (client *DfsClient) UploadFile(fileName string) (request.UploadFileResponse, error) {
-	url := utils.HOST
+	url := client.Host
 
 	form_data := map[string]string{
 		"accessKey":  client.AccessKey,
@@ -55,7 +49,7 @@ func (client *DfsClient) UploadFile(fileName string) (request.UploadFileResponse
 }
 
 func (client *DfsClient) DownloadFile(fileId string) ([]byte, error) {
-	url := utils.HOST
+	url := client.Host
 
 	downloadRequest := request.DownloadFileRequest{
 		AccessKey:  client.AccessKey,
@@ -70,7 +64,7 @@ func (client *DfsClient) DownloadFile(fileId string) ([]byte, error) {
 }
 
 func (client *DfsClient) GetPreSignedUrl(fileId string) (request.UploadFileResponse, error) {
-	url := utils.HOST
+	url := client.Host
 	preSignedUrl := request.GetPreSignedUrlRequest{
 		AccessKey:  client.AccessKey,
 		SecretKey:  client.SecretKey,
@@ -84,7 +78,7 @@ func (client *DfsClient) GetPreSignedUrl(fileId string) (request.UploadFileRespo
 }
 
 func (client *DfsClient) CheckMd5(fileName string) (request.FastUploadResponse, error) {
-	url := utils.HOST
+	url := client.Host
 	fileMd5, err := utils.GetFileMd5Values(fileName)
 	if err != nil {
 		return request.FastUploadResponse{}, err

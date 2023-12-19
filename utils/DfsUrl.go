@@ -1,7 +1,6 @@
 package utils
 
 const (
-	HOST              = "http://172.16.0.102:9090"
 	UPLOAD_FILE       = "/dfs/upload/file"
 	FAST_UPLOAD       = "/dfs/check/md5"
 	PRE_SIGNED_URL    = "/dfs/signed/url"
