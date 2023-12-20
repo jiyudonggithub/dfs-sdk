@@ -229,6 +229,64 @@ func (cus *CusHttp) PostMultipart(url string, filePath string, data map[string]s
 	return body, nil
 }
 
+func (cus *CusHttp) PostMultipartFile(url string, file multipart.File, header *multipart.FileHeader, data map[string]string) ([]byte, error) {
+
+	bodyBuf := &bytes.Buffer{}
+	bodyWriter := multipart.NewWriter(bodyBuf)
+
+	fileWriter1, err := bodyWriter.CreateFormFile("file", header.Filename)
+	if err != nil {
+		return nil, err
+	}
+	//把文件流写入到缓冲区里去
+	_, err1 := io.Copy(fileWriter1, file)
+	if err1 != nil {
+		return nil, err
+	}
+	// 参数2 fileType (普通参数)
+	for k, vla := range data {
+		fileWriter2, err := bodyWriter.CreateFormField(k)
+		if err != nil {
+			return nil, err
+		}
+		_, errs2 := fileWriter2.Write([]byte(vla))
+		if errs2 != nil {
+			return nil, err
+		}
+	}
+
+	// 一定要记着关闭
+	err = bodyWriter.Close()
+	if err != nil {
+		return nil, err
+	}
+	//发送post请求
+	req, err := http.NewRequest("POST", url, bodyBuf)
+	if err != nil {
+		return nil, err
+	}
+	//添加头文件
+	if cus.Header != nil && len(cus.Header) > 0 {
+		for k, vla := range cus.Header {
+			req.Header.Add(k, vla)
+		}
+	}
+	//添加头文件
+	//req.Header.Set("Content-Type", "multipart/form-data")
+	req.Header.Set("Content-Type", bodyWriter.FormDataContentType())
+	//获取返回值
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
+}
+
 func (cus *CusHttp) PostMultipartChunk(url string, chunkBytes []byte, data map[string]string) ([]byte, error) {
 
 	bodyBuf := &bytes.Buffer{}

@@ -3,6 +3,7 @@ package dfsClient
 import (
 	"github.com/jiyudonggithub/dfs-sdk/request"
 	"github.com/jiyudonggithub/dfs-sdk/utils"
+	"mime/multipart"
 	"path/filepath"
 )
 
@@ -40,6 +41,26 @@ func (client *DfsClient) UploadFile(fileName string) (request.UploadFileResponse
 
 	// 上传文件
 	multipart, err := client.client.PostMultipart(url+utils.UPLOAD_FILE, fileName, form_data)
+	if err != nil {
+		return request.UploadFileResponse{}, err
+	}
+	response := request.UploadFileResponseCode{}
+	err = utils.StrToStruct(string(multipart), &response)
+	return response.Data, nil
+}
+
+func (client *DfsClient) UploadMultipartFile(file multipart.File, header *multipart.FileHeader) (request.UploadFileResponse, error) {
+	url := client.Host
+
+	form_data := map[string]string{
+		"accessKey":  client.AccessKey,
+		"secretKey":  client.SecretKey,
+		"fileName":   header.Filename,
+		"bucketName": client.bucketName,
+	}
+
+	// 上传文件
+	multipart, err := client.client.PostMultipartFile(url+utils.UPLOAD_FILE, file, header, form_data)
 	if err != nil {
 		return request.UploadFileResponse{}, err
 	}
