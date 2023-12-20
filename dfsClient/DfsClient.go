@@ -49,18 +49,18 @@ func (client *DfsClient) UploadFile(fileName string) (request.UploadFileResponse
 	return response.Data, nil
 }
 
-func (client *DfsClient) UploadMultipartFile(file multipart.File, header *multipart.FileHeader) (request.UploadFileResponse, error) {
+func (client *DfsClient) UploadMultipartFile(file multipart.File, fileName string) (request.UploadFileResponse, error) {
 	url := client.Host
 
 	form_data := map[string]string{
 		"accessKey":  client.AccessKey,
 		"secretKey":  client.SecretKey,
-		"fileName":   header.Filename,
+		"fileName":   fileName,
 		"bucketName": client.bucketName,
 	}
 
 	// 上传文件
-	multipart, err := client.client.PostMultipartFile(url+utils.UPLOAD_FILE, file, header, form_data)
+	multipart, err := client.client.PostMultipartFile(url+utils.UPLOAD_FILE, file, fileName, form_data)
 	if err != nil {
 		return request.UploadFileResponse{}, err
 	}

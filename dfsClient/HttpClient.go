@@ -229,12 +229,12 @@ func (cus *CusHttp) PostMultipart(url string, filePath string, data map[string]s
 	return body, nil
 }
 
-func (cus *CusHttp) PostMultipartFile(url string, file multipart.File, header *multipart.FileHeader, data map[string]string) ([]byte, error) {
+func (cus *CusHttp) PostMultipartFile(url string, file multipart.File, fileName string, data map[string]string) ([]byte, error) {
 
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
 
-	fileWriter1, err := bodyWriter.CreateFormFile("file", header.Filename)
+	fileWriter1, err := bodyWriter.CreateFormFile("file", fileName)
 	if err != nil {
 		return nil, err
 	}
